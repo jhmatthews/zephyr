@@ -2,6 +2,12 @@
 __pycache__/
 *.py[cod]
 
+# output from code
+output
+output/*
+*.pf
+
+
 # C extensions
 *.so
 
