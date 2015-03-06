@@ -130,3 +130,53 @@ def spec_disk2 (f1,f2,m,mdot,rmin,rmax):
 			spec[i]=spec[i]+(ah.planck_nu(t,freq[i])*area*PI*2)
 	return (freq,spec)
 
+
+from astro_const import *
+
+def planck_nu (T, nu):
+
+	''' 
+	The planck function for frequency nu at temperature T
+
+	nu must be array like
+	'''
+
+	try:
+		nt = len(T)
+	except TypeError:
+		nt = 1
+
+	try:
+		n_nu = len(nu)
+	except:
+		n_nu = 1
+
+
+	if nt == 1 or n_nu == 1:
+		nu_calc = nu
+		x = H * nu / (BOLTZMANN * T)
+	else:
+		t_calc, nu_calc= np.meshgrid(T, nu)
+		x = H * nu_calc / (BOLTZMANN * t_calc)
+
+
+	f = (2. * H * nu_calc ** 3.) / (C ** 2. * (np.exp(x) - 1.))
+    
+	try:
+		f = float(f)
+	except TypeError:
+		f = f
+	
+	return f
+	
+	
+def planck_lamb (T, lamb):
+
+	''' 
+	The planck function for wavelength lamb at temperature T
+	'''
+	x = H * C / (BOLTZMANN * T * lamb)
+	f = (2. * H * C**2.0) / (lamb**5. * (np.exp(x) - 1.))
+    
+	return f
+

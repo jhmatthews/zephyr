@@ -101,13 +101,13 @@ def sv_velocity (x, rot=True):
       		project_from_cyl_xyz (x, v, xtest)
      	 	v=stuff_v (xtest)
   	speed = (np.sqrt (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]))
-  	return (speed,v)
+  	return (v)
 
 
 
 def sv_rho (x):
 
-	speed,v=sv_velocity (x)
+	v=sv_velocity (x)
 	rzero = sv_find_wind_rzero (x)
   	theta = sv_theta_wind (rzero)
 	r = np.sqrt (x[0] * x[0] + x[1] * x[1])
@@ -175,29 +175,6 @@ def sv_zero_r (r,zero_p):
  	rho = np.sqrt (zero_p[0] * zero_p[0] + zero_p[1] * zero_p[1])
   	rho_guess = r + np.tan (theta) * zero_p[2]
   	return (rho_guess - rho)
-
-
-
-# def get_dvds(x, angle=80.0, mode="rot"):
-
-# 	if mode == "pol":
-# 		rot = False
-# 	else:
-# 		rot = True
-
-# 	ds = 1e-5
-
-# 	test_x = x
-# 	test_x[0] = x + (ds * np.sin(PI * (angle / 180.0)))
-# 	test_x[2] = x + (ds * np.cos(PI * (angle / 180.0)))
-
-# 	speed1, v1 = sv_velocity(x, rot=rot)
-# 	speed2, v2 = sv_velocity(test_x, rot=rot)
-
-# 	v1comp =  
-# 	v2comp =
-
-# 	return dv
 
 
 
