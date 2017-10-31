@@ -49,10 +49,11 @@ class grid():
 		self.sv.thetamax = float(self.params["sv.thetamax"]) / RADIAN
 		self.sv.wind_rmax = float(self.params["wind.radmax"])
 		self.sv.v_zero = 6e5 		# hardwired value of 6 km/s
-		self.sv.v_infinity = float(self.params["wind.radmax"]) 		# hardwired value of 6 km/s
+		self.sv.v_infinity = float(self.params["sv.v_infinity"]) 		# hardwired value of 6 km/s
 		self.sv.sv_lambda = float(self.params["sv.mdot_r_exponent"])
 		self.sv.gamma = 1.0
 		self.sv.wind_mdot = float(self.params["wind.mdot"]) * MSOL / YR
+		self.fill_factor = float(self.params["filling_factor"]) 
 
 		self.sv.get_mdot_norm()
 
@@ -66,41 +67,55 @@ class grid():
 		# hardwired x and z scales at the moment, as well as "cen_or_not"
 		self.x, self.z = geo.get_grid(self.compact_object.rstar/10.0, self.sv.rmin, self.nz, self.nx, self.sv.wind_rmax, 0)
 
-		print (self.z)
+		self.grid_shape = [len(self.x), len(self.z)]
+		indices = np.indices(self.grid_shape)
+		self.x2d = self.x[indices[0]]
+		self.z2d = self.z[indices[1]]
+
+		#print (self.x2d.shape)
+
+		#print (self.z)
 
 	def populate_primitive_variables(self):
 		'''
 		populate the grid with primitive variables (density, velocity and so on)
 
-		IMPROVE: make more pythonic, less for looping please!
+		IMPROVE: make more pythonic, less for-looping please!
 		'''
-		self.nh = np.zeros([len(self.x), len(self.z)])
-		self.density = np.zeros_like(self.nh)
-		self.velocity = np.zeros_like(self.nh)
+
+		# these help construct a mask for in and out of wind
+		rho_min = self.sv.rmin + self.z2d * np.tan (self.sv.thetamin)
+		rho_max = self.sv.rmax + self.z2d * np.tan (self.sv.thetamax)
+
+		# this masks values out of the wind
+		inwind_mask = (self.x2d > rho_max) + (self.x2d < rho_min)
+
+		print (self.x2d)
+
+		# create masked arrays
+		shape = self.x2d.shape
+		self.nh = np.ma.masked_array(np.zeros(shape), mask=inwind_mask)
+		self.density = np.ma.masked_array(np.zeros(shape), mask=inwind_mask)
+		self.velocity = np.ma.masked_array(np.zeros(shape), mask=inwind_mask)
 
 		for  j in range(len(self.z)):
 			for i in range(len(self.x)):
-				rho_min = self.sv.rmin + self.z[j] * np.tan (self.sv.thetamin)
-				rho_max = self.sv.rmax + self.z[j] * np.tan (self.sv.thetamax)
 
-				if (self.x[i] <= rho_max and self.x[i] >= rho_min):
+				if not (inwind_mask[i,j]):
 
 					# 3d vector, x, theta, z 
 					xtest = [self.x[i], 0.0, self.z[j]]
 
 					# get density from sv subroutines, convert to hydrogen density 
-					self.density[i,j] = self.sv.sv_rho(xtest)
+					self.density[i,j] = self.sv.sv_rho(xtest) / self.fill_factor
+
 					n_h = self.density[i,j] * RHO2NH
 
 					# copy to array
 					self.nh[i,j] = np.log10(n_h)
 
 					# need to add velocity here
-
-			else:
-				# improve: out of wind, the values should be masked.
-				self.density[i,j] = -99
-				self.nh[i,j] = -99
+					print ( self.density[i,j], n_h)
 
 
 if __name__ == "__main__":
@@ -113,8 +128,9 @@ if __name__ == "__main__":
 
 	import matplotlib.pyplot as plt 
 
-	print (mod.x, mod.z, mod.nh)
-	plt.pcolormesh(mod.x, mod.z, mod.nh.T, vmin = 4, vmax=14)
+	#print (mod.x, mod.z, mod.nh)
+	plt.pcolormesh(mod.x2d, mod.z2d, mod.nh)
+	plt.colorbar()
 	plt.loglog()
 	plt.xlim(1e15,1e20)
 	plt.ylim(1e15,1e20)

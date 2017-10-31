@@ -12,3 +12,4 @@ sv.acceleration_length    	1e19
 sv.acceleration_exponent  	0.5
 wind.radmax					1e20
 wind.mdot           		5.0
+filling_factor 				0.01
