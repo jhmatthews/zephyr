@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+'''
+				zephyr 
+
+Zephyr is a program that sets up a biconical wind
+model by setting up a series of streamlines with an
+analytical velocity law and then integrating continuity
+equations to get the density at a given point.
+
+Usage:
+	python zephyr.py [filename]
+	where filename is a radiative transfer style parameter filename
+'''
 import py_read_output as r 
 import sv_sub
 import sys
@@ -26,7 +39,7 @@ class grid():
 
 		Parameters:
 			root 	string
-					parameter filename
+					parameter filename to read 
 		'''
 
 		# read a root filename 
@@ -60,6 +73,10 @@ class grid():
 
 
 	def setup(self):
+
+		'''
+		setup some grid arrays 
+		'''
 
 		self.nx = int(self.params["Wind.dim.in.x_or_r.direction"])
 		self.nz = int(self.params["Wind.dim.in.z_or_theta.direction"])
@@ -120,45 +137,25 @@ class grid():
 
 if __name__ == "__main__":
 
-	root = sys.argv[1]
+	if len(sys.argv) > 1:
+		root = sys.argv[1]
 
-	mod = grid(root)
-	mod.setup()
-	mod.populate_primitive_variables()
+		mod = grid(root)
+		mod.setup()
+		mod.populate_primitive_variables()
 
-	import matplotlib.pyplot as plt 
+		import matplotlib.pyplot as plt 
 
-	#print (mod.x, mod.z, mod.nh)
-	plt.pcolormesh(mod.x2d, mod.z2d, mod.nh)
-	plt.colorbar()
-	plt.loglog()
-	plt.xlim(1e15,1e20)
-	plt.ylim(1e15,1e20)
-	plt.show()
+		#print (mod.x, mod.z, mod.nh)
+		plt.pcolormesh(mod.x2d, mod.z2d, mod.nh)
+		plt.colorbar()
+		plt.loglog()
+		plt.xlim(1e15,1e20)
+		plt.ylim(1e15,1e20)
+		plt.show()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	else:
+		print (__doc__)
 
 
 
