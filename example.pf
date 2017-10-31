@@ -1,0 +1,14 @@
+Wind.dim.in.x_or_r.direction         100
+Wind.dim.in.z_or_theta.direction     200
+mstar   					1e9
+rstar   					8.85667e+14
+sv.diskmin    				50
+sv.diskmax    				100.0
+sv.thetamin   				70
+sv.thetamax   				82.0
+sv.mdot_r_exponent    		0.0
+sv.v_infinity         		1.0
+sv.acceleration_length    	1e19
+sv.acceleration_exponent  	0.5
+wind.radmax					1e20
+wind.mdot           		5.0
